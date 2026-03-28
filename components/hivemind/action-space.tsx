@@ -54,7 +54,7 @@ const MOCK_FORM_FIELDS: FormField[] = [
   { label: "Signature", value: "", filled: false, required: true },
 ];
 
-const SIMPLI_OVERLAY = [
+const TERM_HINTS = [
   {
     term: "Alien Registration Number",
     plain: "Your USCIS ID. It starts with 'A' and has 9 digits. Found on your I-94 or visa documents.",
@@ -67,9 +67,8 @@ const SIMPLI_OVERLAY = [
 
 export function ActionSpace() {
   const [tabs, setTabs] = useState<BrowserTab[]>(MOCK_TABS);
-  const [showSimpliOverlay, setShowSimpliOverlay] = useState(true);
-  // TODO: hook up to Dante's real Selenium status (idle | filling | done)
-  const [danteStatus] = useState<"idle" | "filling" | "done">("done");
+  const [showTermHints, setShowTermHints] = useState(true);
+  const [formAssistStatus] = useState<"idle" | "filling" | "done">("done");
 
   const activeTab = tabs.find((t) => t.active);
   const filledCount = MOCK_FORM_FIELDS.filter((f) => f.filled).length;
@@ -148,23 +147,21 @@ export function ActionSpace() {
 
       {/* Main content: scrollable */}
       <div className="flex-1 overflow-y-auto">
-        {/* Dante ghost-fill panel */}
+        {/* Form assist panel */}
         <div className="border-b border-white/5 p-3">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
               <Zap className="h-4 w-4 text-orange-400" />
-              <span className="text-xs font-semibold text-orange-400">
-                Dante · Ghost Fill
-              </span>
+              <span className="text-xs font-semibold text-orange-400">Form assist</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px] text-white/40">
                 {filledCount}/{totalCount} fields
               </span>
-              {danteStatus === "done" && (
+              {formAssistStatus === "done" && (
                 <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
               )}
-              {danteStatus === "filling" && (
+              {formAssistStatus === "filling" && (
                 <Loader2 className="h-3.5 w-3.5 text-orange-400 animate-spin" />
               )}
             </div>
@@ -215,33 +212,33 @@ export function ActionSpace() {
           </div>
 
           <button className="mt-2 w-full rounded-md bg-orange-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-orange-500 disabled:opacity-50">
-            Review & Submit → {/* TODO: trigger Dante submit via Selenium */}
+            Review & Submit →
           </button>
         </div>
 
-        {/* Simpli overlay panel */}
+        {/* Plain-language terms */}
         <div className="border-b border-white/5 p-3">
           <button
-            onClick={() => setShowSimpliOverlay(!showSimpliOverlay)}
+            onClick={() => setShowTermHints(!showTermHints)}
             className="flex w-full items-center justify-between"
           >
             <div className="flex items-center gap-1.5">
               <Brain className="h-4 w-4 text-emerald-400" />
               <span className="text-xs font-semibold text-emerald-400">
-                Simpli · Jargon Decoder
+                Plain-language terms
               </span>
             </div>
             <ChevronDown
               className={cn(
                 "h-3.5 w-3.5 text-white/30 transition-transform",
-                !showSimpliOverlay && "-rotate-90",
+                !showTermHints && "-rotate-90",
               )}
             />
           </button>
 
-          {showSimpliOverlay && (
+          {showTermHints && (
             <div className="mt-2 space-y-2">
-              {SIMPLI_OVERLAY.map((item) => (
+              {TERM_HINTS.map((item) => (
                 <div
                   key={item.term}
                   className="rounded-md border border-emerald-500/20 bg-emerald-600/5 p-2"
@@ -267,11 +264,6 @@ export function ActionSpace() {
           <div className="space-y-1.5">
             <button className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-white/50 transition-colors hover:border-indigo-500/40 hover:bg-indigo-600/10 hover:text-white/80">
               Invite a Guide to co-control this browser →
-              {/* TODO: LiveKit co-pilot session */}
-            </button>
-            <button className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-white/50 transition-colors hover:border-blue-500/40 hover:bg-blue-600/10 hover:text-white/80">
-              Start roleplay with Mismo (AI Officer) →
-              {/* TODO: LiveKit agent call */}
             </button>
           </div>
         </div>

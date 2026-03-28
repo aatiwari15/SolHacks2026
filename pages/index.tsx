@@ -11,20 +11,16 @@ export default function HiveMindPage() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#1a1a2e]">
-      {/* Narrow server / app icon bar */}
       <ServerSidebar />
 
-      {/* Channel list + member list sidebar */}
       <ChannelSidebar activeChannelName={ACTIVE_CHANNEL} />
 
-      {/* Main chat area — fills remaining width */}
       <ChatArea
         channelName={ACTIVE_CHANNEL}
         showActionSpace={showActionSpace}
         onToggleActionSpace={() => setShowActionSpace((v) => !v)}
       />
 
-      {/* Right pane: Action Space (Selenium Stage) — toggled by header button */}
       {showActionSpace && <ActionSpace />}
     </div>
   );

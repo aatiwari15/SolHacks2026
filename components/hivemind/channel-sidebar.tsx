@@ -71,9 +71,6 @@ const CHANNELS: ChannelCategory[] = [
 const ONLINE_MEMBERS = [
   { id: "1", name: "Maria G.", role: "Guide", lang: "ES→EN" },
   { id: "2", name: "Anh T.", role: "Learner", lang: "VI→EN" },
-  { id: "3", name: "Dante", role: "AI", lang: "Agent" },
-  { id: "4", name: "Mismo", role: "AI", lang: "Agent" },
-  { id: "5", name: "Simpli", role: "AI", lang: "Agent" },
 ];
 
 function ChannelIcon({ type }: { type: Channel["type"] }) {
@@ -162,15 +159,9 @@ export function ChannelSidebar({ activeChannelName: _activeChannelName }: Channe
                   <AvatarFallback
                     className={cn(
                       "text-[10px] font-bold",
-                      m.role === "AI"
-                        ? m.name === "Dante"
-                          ? "bg-orange-600 text-white"
-                          : m.name === "Mismo"
-                            ? "bg-blue-600 text-white"
-                            : "bg-emerald-600 text-white"
-                        : m.role === "Guide"
-                          ? "bg-purple-700 text-white"
-                          : "bg-zinc-600 text-white",
+                      m.role === "Guide"
+                        ? "bg-purple-700 text-white"
+                        : "bg-zinc-600 text-white",
                     )}
                   >
                     {m.name.slice(0, 2)}

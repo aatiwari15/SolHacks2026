@@ -16,7 +16,6 @@ import {
   Video,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { AgentToggleBar, type ActiveAgent } from "./agent-toggle-bar";
 import { MessageBubble, type Message } from "./message-bubble";
 
 // ---------------------------------------------------------------------------
@@ -39,7 +38,7 @@ const MOCK_MESSAGES: Message[] = [
   },
   {
     id: "3",
-    author: { type: "agent", agent: "simpli" },
+    author: { type: "user", name: "Maria G.", initials: "MG", role: "Guide" },
     content:
       '"Adjustment of Status" means you are changing your immigration category from a temporary visa (like a tourist or student visa) to a permanent resident (Green Card holder) while staying inside the United States.',
     timestamp: "Today at 10:04 AM",
@@ -55,17 +54,16 @@ const MOCK_MESSAGES: Message[] = [
   },
   {
     id: "5",
-    author: { type: "agent", agent: "dante" },
+    author: { type: "user", name: "Maria G.", initials: "MG", role: "Guide" },
     content:
-      "I've detected the DMV form in the Action Space. I can pre-fill your name, date of birth, and address from your profile. Please review and click Submit when ready.",
+      "I'm looking at the DMV form in the Action Space. We can walk through name, date of birth, and address from your profile — review everything before you submit.",
     timestamp: "Today at 10:07 AM",
-    agentAction: "Ghost-filling fields: Full Name, DOB, Address, State ID #  •  3 fields ready for review",
   },
   {
     id: "6",
-    author: { type: "agent", agent: "mismo" },
+    author: { type: "user", name: "Maria G.", initials: "MG", role: "Guide" },
     content:
-      "Hi Anh! I'm ready to help you practice explaining your situation in English for the DMV interview. Want to do a quick 3-minute roleplay? I'll act as the DMV officer.",
+      "Whenever you're ready, we can do a short practice round for the DMV interview — I can play the officer and you practice your answers.",
     timestamp: "Today at 10:09 AM",
   },
   {
@@ -88,7 +86,6 @@ export function ChatArea({
   showActionSpace,
   onToggleActionSpace,
 }: ChatAreaProps) {
-  const [activeAgent, setActiveAgent] = useState<ActiveAgent>(null);
   const [inputValue, setInputValue] = useState("");
   const [messages] = useState<Message[]>(MOCK_MESSAGES);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -146,9 +143,6 @@ export function ChatArea({
         </div>
       </div>
 
-      {/* Agent toggle bar */}
-      <AgentToggleBar activeAgent={activeAgent} onToggle={setActiveAgent} />
-
       {/* Messages */}
       <div className="flex-1 overflow-y-auto py-2">
         {/* Channel intro */}
@@ -159,7 +153,7 @@ export function ChatArea({
           <h2 className="mt-2 text-xl font-bold text-white">#{channelName}</h2>
           <p className="text-sm text-white/50">
             This is the beginning of #{channelName}. A safe space to ask questions,
-            share experiences, and get real help — from humans and AI alike.
+            share experiences, and get help from the community.
           </p>
         </div>
         <Separator className="mx-4 mb-4 bg-white/5" />
@@ -171,42 +165,7 @@ export function ChatArea({
 
       {/* Input area */}
       <div className="shrink-0 px-4 pb-4">
-        {/* Agent active indicator */}
-        {activeAgent && (
-          <div
-            className={cn(
-              "mb-2 flex items-center gap-2 rounded-t-lg border border-b-0 px-3 py-1.5 text-xs",
-              activeAgent === "dante"
-                ? "border-orange-500/30 bg-orange-600/10 text-orange-400"
-                : activeAgent === "mismo"
-                  ? "border-blue-500/30 bg-blue-600/10 text-blue-400"
-                  : "border-emerald-500/30 bg-emerald-600/10 text-emerald-400",
-            )}
-          >
-            <span className="h-1.5 w-1.5 rounded-full animate-pulse bg-current" />
-            <span>
-              {activeAgent === "dante" &&
-                "Dante is watching the Action Space for forms to fill"}
-              {activeAgent === "mismo" &&
-                "Mismo will join your next video call for practice"}
-              {activeAgent === "simpli" &&
-                "Simpli will tag and translate complex terms in messages"}
-            </span>
-          </div>
-        )}
-
-        <div
-          className={cn(
-            "flex items-end gap-2 rounded-lg border bg-white/5 px-3 py-2 focus-within:border-white/20 transition-colors",
-            activeAgent === "dante"
-              ? "border-orange-500/30"
-              : activeAgent === "mismo"
-                ? "border-blue-500/30"
-                : activeAgent === "simpli"
-                  ? "border-emerald-500/30"
-                  : "border-white/10",
-          )}
-        >
+        <div className="flex items-end gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 focus-within:border-white/20 transition-colors">
           <button className="shrink-0 p-1 text-white/30 hover:text-white/60 transition-colors">
             <ImagePlus className="h-5 w-5" />
           </button>
