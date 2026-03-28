@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import type { User } from "@supabase/supabase-js";
 import { mapProfileRow, normalizeProfileInput, type ProfileRecord } from "@/lib/profile";
 import { supabaseAdmin } from "@/server/lib/supabase";
 
@@ -10,6 +11,25 @@ type ProfileResponse = {
   ok: true;
   profile: ProfileRecord;
 };
+
+function buildFallbackProfile(
+  authUser: User,
+  profileInput?: ProfileRecord,
+): ProfileRecord {
+  return {
+    ...mapProfileRow(null),
+    ...(profileInput ?? {}),
+    preferredLanguage:
+      profileInput?.preferredLanguage ||
+      (typeof authUser.user_metadata?.preferredLanguage === "string"
+        ? authUser.user_metadata.preferredLanguage
+        : ""),
+    fullName:
+      profileInput?.fullName ||
+      (typeof authUser.user_metadata?.name === "string" ? authUser.user_metadata.name : ""),
+    email: profileInput?.email || authUser.email || "",
+  };
+}
 
 function isMissingColumnError(message: string) {
   const normalized = message.toLowerCase();
@@ -66,18 +86,7 @@ export default async function handler(
     if (error && isMissingProfilesTableError(error.message)) {
       return res.status(200).json({
         ok: true,
-        profile: {
-          ...mapProfileRow(null),
-          preferredLanguage:
-            typeof authResult.user.user_metadata?.preferredLanguage === "string"
-              ? authResult.user.user_metadata.preferredLanguage
-              : "",
-          fullName:
-            typeof authResult.user.user_metadata?.name === "string"
-              ? authResult.user.user_metadata.name
-              : "",
-          email: authResult.user.email ?? "",
-        },
+        profile: buildFallbackProfile(authResult.user),
       });
     }
 
@@ -92,6 +101,7 @@ export default async function handler(
   }
 
   const profileInput = normalizeProfileInput(req.body);
+  const fallbackProfile = buildFallbackProfile(authResult.user, profileInput);
 
   const { error: profileError, data } = await supabaseAdmin
     .from("profiles")
@@ -122,36 +132,61 @@ export default async function handler(
     console.warn("Profiles table is missing in Supabase; continuing without persisted profile data.");
     return res.status(200).json({
       ok: true,
-      profile: {
-        ...profileInput,
-        email: profileInput.email || authResult.user.email || "",
-      },
+      profile: fallbackProfile,
     });
   }
 
   if (profileError && isMissingColumnError(profileError.message)) {
-    const { error: fallbackError, data: fallbackData } = await supabaseAdmin
-      .from("profiles")
-      .upsert(
-        {
-          user_id: authResult.user.id,
-          native_language: profileInput.preferredLanguage,
-          expertise_level: "learner",
-          community_tags: [],
-        },
-        { onConflict: "user_id" },
-      )
-      .select("*")
-      .single();
+    const fallbackPayloads = [
+      {
+        user_id: authResult.user.id,
+        native_language: profileInput.preferredLanguage,
+        expertise_level: "learner",
+      },
+      {
+        user_id: authResult.user.id,
+        native_language: profileInput.preferredLanguage,
+      },
+      {
+        user_id: authResult.user.id,
+      },
+    ];
 
-    if (fallbackError) {
+    for (const payload of fallbackPayloads) {
+      const { error: fallbackError, data: fallbackData } = await supabaseAdmin
+        .from("profiles")
+        .upsert(payload, { onConflict: "user_id" })
+        .select("*")
+        .single();
+
+      if (!fallbackError) {
+        return res.status(200).json({
+          ok: true,
+          profile: mapProfileRow(fallbackData as Record<string, unknown>),
+        });
+      }
+
+      if (isMissingColumnError(fallbackError.message)) {
+        console.warn("Profile fallback is retrying with fewer columns:", fallbackError.message);
+        continue;
+      }
+
+      if (isMissingProfilesTableError(fallbackError.message)) {
+        console.warn("Profiles table is missing during fallback; continuing without persisted profile data.");
+        return res.status(200).json({
+          ok: true,
+          profile: fallbackProfile,
+        });
+      }
+
       console.error("Profile fallback upsert failed:", fallbackError.message);
       return res.status(500).json({ error: fallbackError.message });
     }
 
+    console.warn("Profiles schema is older than expected; continuing without persisted profile data.");
     return res.status(200).json({
       ok: true,
-      profile: mapProfileRow(fallbackData as Record<string, unknown>),
+      profile: fallbackProfile,
     });
   }
 

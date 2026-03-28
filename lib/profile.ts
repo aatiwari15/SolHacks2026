@@ -72,3 +72,15 @@ export function mapProfileRow(row: Record<string, unknown> | null | undefined): 
   };
 }
 
+export function isProfileReadyForAutofill(profile: ProfileRecord) {
+  return [
+    profile.fullName,
+    profile.email,
+    profile.phoneNumber,
+    profile.addressLine1,
+    profile.city,
+    profile.stateRegion,
+    profile.postalCode,
+    profile.country,
+  ].every((value) => value.trim().length > 0);
+}
