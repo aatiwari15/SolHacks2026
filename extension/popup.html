@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Unidad Form Bot</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #faf8f5;
+    --bg2:     #f2ede4;
+    --panel:   #ffffff;
+    --border:  #e2d8cb;
+    --text:    #1f1309;
+    --muted:   #7a6045;
+    --faint:   #a8906c;
+    --amber:   #d97706;
+    --amber-d: #b45309;
+    --amber-l: #fef3c7;
+    --orange:  #ea580c;
+    --green:   #16a34a;
+    --red:     #dc2626;
+    --blue:    #1d4ed8;
+    --teal:    #0d9488;
+    --r:       8px;
+  }
+
+  body {
+    width: 380px;
+    min-height: 300px;
+    max-height: 620px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px 0;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .logo {
+    width: 24px; height: 24px; background: var(--amber); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .brand { font-size: 13px; font-weight: 700; flex: 1; }
+  .header-url { font-size: 10px; color: var(--muted); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; margin-left: 4px; }
+  .tab-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    padding: 8px 12px; border-bottom: 2px solid transparent;
+    transition: color .12s, border-color .12s;
+  }
+  .tab-btn.active { color: var(--amber-d); border-bottom-color: var(--amber); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+
+  /* ── Alerts ── */
+  .alert {
+    padding: 8px 14px; font-size: 12px; font-weight: 500;
+    display: none; flex-shrink: 0; line-height: 1.4; align-items: flex-start; gap: 6px;
+  }
+  .alert.show       { display: flex; }
+  .alert.info       { background: var(--amber-l); color: #92400e; border-bottom: 1px solid #fde68a; }
+  .alert.error      { background: #fee2e2; color: var(--red); border-bottom: 1px solid #fca5a5; }
+  .alert.ok         { background: #dcfce7; color: var(--green); border-bottom: 1px solid #86efac; }
+  .alert.notice     { background: #eff6ff; color: var(--blue); border-bottom: 1px solid #bfdbfe; }
+  .alert-icon       { flex-shrink: 0; }
+  .alert-body strong { display: block; font-weight: 700; }
+
+  /* ── Main scroll area ── */
+  #main { flex: 1; overflow-y: auto; }
+
+  /* ── Tab panels ── */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Empty state ── */
+  .empty-state { padding: 28px 20px; text-align: center; }
+  .empty-state .icon { font-size: 34px; margin-bottom: 10px; }
+  .empty-state h2 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .empty-state p { color: var(--muted); font-size: 12px; line-height: 1.5; max-width: 230px; margin: 0 auto 16px; }
+
+  /* ── Buttons ── */
+  .btn {
+    border: none; border-radius: var(--r); font-weight: 600; font-size: 12px;
+    cursor: pointer; padding: 8px 16px; transition: all .12s; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-primary { background: var(--amber); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--amber-d); }
+  .btn-orange  { background: var(--orange); color: #fff; }
+  .btn-orange:hover:not(:disabled)  { background: #c2410c; }
+  .btn-green   { background: var(--green);  color: #fff; }
+  .btn-green:hover:not(:disabled)   { background: #15803d; }
+  .btn-teal    { background: var(--teal);   color: #fff; }
+  .btn-teal:hover:not(:disabled)    { background: #0f766e; }
+  .btn-ghost   { background: var(--bg2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover:not(:disabled)   { background: var(--border); }
+  .btn-full    { width: 100%; justify-content: center; }
+
+  /* ── Form meta row ── */
+  .form-meta {
+    padding: 8px 14px; background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: none; align-items: center; gap: 8px;
+  }
+  .form-meta.show { display: flex; }
+  .form-meta-title { font-weight: 700; font-size: 12px; flex: 1; }
+  .field-count { font-size: 10px; color: var(--muted); }
+  .match-count { font-size: 10px; color: var(--teal); font-weight: 600; }
+
+  /* ── Field rows ── */
+  .field-row { padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  .field-row:last-child { border-bottom: none; }
+  .field-top {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 5px;
+  }
+  .field-label { font-weight: 600; font-size: 12px; flex: 1; }
+  .field-req   { color: var(--orange); font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .field-matched {
+    font-size: 10px; font-weight: 600; color: var(--teal);
+    background: #ccfbf1; padding: 1px 6px; border-radius: 999px; flex-shrink: 0;
+  }
+  .field-sel   { font-family: monospace; font-size: 10px; color: var(--faint); display: block; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+  .answer-input {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; background: var(--bg); outline: none;
+    color: var(--text); transition: border .12s; font-family: inherit;
+  }
+  .answer-input:focus { border-color: var(--amber); background: #fff; }
+  .answer-input.matched { border-color: #5eead4; background: #f0fdfa; }
+  .answer-input.matched:focus { border-color: var(--teal); }
+
+  /* ── Result chips ── */
+  #fill-chips { padding: 6px 14px; display: none; flex-wrap: wrap; gap: 4px; }
+  #fill-chips.show { display: flex; }
+  .chip { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; }
+  .chip.ok  { background: #dcfce7; color: var(--green); }
+  .chip.err { background: #fee2e2; color: var(--red); }
+
+  /* ── Action bar ── */
+  #action-bar {
+    display: none; padding: 10px 14px; background: var(--panel);
+    border-top: 1px solid var(--border); flex-shrink: 0; gap: 6px; flex-wrap: wrap;
+  }
+  #action-bar.show { display: flex; }
+
+  /* ── Profile tab ── */
+  .profile-section { padding: 10px 14px 4px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--faint); margin-bottom: 8px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+  .profile-grid.full { grid-template-columns: 1fr; }
+  .profile-field label { display: block; font-size: 10px; font-weight: 600; color: var(--muted); margin-bottom: 3px; }
+  .profile-input {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 6px;
+    padding: 5px 8px; font-size: 12px; background: var(--bg); outline: none;
+    color: var(--text); transition: border .12s; font-family: inherit;
+  }
+  .profile-input:focus { border-color: var(--amber); background: #fff; }
+  .profile-select { appearance: auto; }
+  .profile-save-bar {
+    padding: 10px 14px 12px; background: var(--panel);
+    border-top: 1px solid var(--border); flex-shrink: 0;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .save-note { font-size: 11px; color: var(--muted); flex: 1; }
+  .save-note.saved { color: var(--green); font-weight: 600; }
+
+  /* ── Spinner ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin {
+    width: 12px; height: 12px; flex-shrink: 0;
+    border: 2px solid #e5d5c0; border-top-color: var(--amber);
+    border-radius: 50%; animation: spin .6s linear infinite;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header + tabs -->
+<header>
+  <div class="logo">🔥</div>
+  <span class="brand">Unidad</span>
+  <span class="header-url" id="header-url"></span>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="fill">Autofill</button>
+    <button class="tab-btn"        data-tab="profile">Profile</button>
+  </nav>
+</header>
+
+<!-- Alerts -->
+<div class="alert" id="alert-status">
+  <span class="alert-icon" id="alert-icon"></span>
+  <div class="alert-body" id="alert-body"></div>
+</div>
+<div class="alert notice" id="alert-iframe">
+  <span class="alert-icon">ℹ️</span>
+  <div class="alert-body">
+    <strong id="iframe-title"></strong>
+    <span id="iframe-msg"></span>
+  </div>
+</div>
+
+<!-- Main scrollable content -->
+<div id="main">
+
+  <!-- ── Autofill tab ── -->
+  <div class="tab-panel active" id="tab-fill">
+
+    <div class="empty-state" id="empty-state">
+      <div class="icon">📋</div>
+      <h2>Ready to autofill</h2>
+      <p>Navigate to a job application or any form, then click <strong>Scan Page</strong>.</p>
+      <button class="btn btn-primary" id="scan-btn">Scan Page</button>
+    </div>
+
+    <div class="form-meta" id="form-meta">
+      <span class="form-meta-title" id="form-title-text"></span>
+      <span class="match-count" id="match-count"></span>
+      <span class="field-count" id="field-count"></span>
+    </div>
+
+    <div id="fill-chips"></div>
+    <div id="fields-section"></div>
+
+  </div>
+
+  <!-- ── Profile tab ── -->
+  <div class="tab-panel" id="tab-profile">
+
+    <!-- Personal -->
+    <div class="profile-section">
+      <div class="section-label">Personal</div>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="p-firstName">First Name</label>
+          <input class="profile-input" id="p-firstName" type="text" placeholder="Jane" />
+        </div>
+        <div class="profile-field">
+          <label for="p-lastName">Last Name</label>
+          <input class="profile-input" id="p-lastName" type="text" placeholder="Doe" />
+        </div>
+        <div class="profile-field">
+          <label for="p-email">Email</label>
+          <input class="profile-input" id="p-email" type="email" placeholder="jane@email.com" />
+        </div>
+        <div class="profile-field">
+          <label for="p-phone">Phone</label>
+          <input class="profile-input" id="p-phone" type="tel" placeholder="555-867-5309" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="profile-section">
+      <div class="section-label">Location</div>
+      <div class="profile-grid full">
+        <div class="profile-field">
+          <label for="p-address">Street Address</label>
+          <input class="profile-input" id="p-address" type="text" placeholder="123 Main St" />
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="p-city">City</label>
+          <input class="profile-input" id="p-city" type="text" placeholder="Charlotte" />
+        </div>
+        <div class="profile-field">
+          <label for="p-state">State</label>
+          <input class="profile-input" id="p-state" type="text" placeholder="NC" />
+        </div>
+        <div class="profile-field">
+          <label for="p-zip">Zip / Postal</label>
+          <input class="profile-input" id="p-zip" type="text" placeholder="28201" />
+        </div>
+        <div class="profile-field">
+          <label for="p-country">Country</label>
+          <input class="profile-input" id="p-country" type="text" placeholder="United States" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Online profiles -->
+    <div class="profile-section">
+      <div class="section-label">Online</div>
+      <div class="profile-grid full">
+        <div class="profile-field">
+          <label for="p-linkedin">LinkedIn URL</label>
+          <input class="profile-input" id="p-linkedin" type="url" placeholder="linkedin.com/in/janedoe" />
+        </div>
+        <div class="profile-field">
+          <label for="p-website">Portfolio / Website</label>
+          <input class="profile-input" id="p-website" type="url" placeholder="janedoe.dev" />
+        </div>
+        <div class="profile-field">
+          <label for="p-github">GitHub</label>
+          <input class="profile-input" id="p-github" type="url" placeholder="github.com/janedoe" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Work -->
+    <div class="profile-section">
+      <div class="section-label">Work</div>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="p-currentTitle">Current Title</label>
+          <input class="profile-input" id="p-currentTitle" type="text" placeholder="Software Engineer" />
+        </div>
+        <div class="profile-field">
+          <label for="p-currentCompany">Current Company</label>
+          <input class="profile-input" id="p-currentCompany" type="text" placeholder="Acme Corp" />
+        </div>
+        <div class="profile-field">
+          <label for="p-yearsExp">Years of Experience</label>
+          <input class="profile-input" id="p-yearsExp" type="text" placeholder="3" />
+        </div>
+        <div class="profile-field">
+          <label for="p-salary">Desired Salary</label>
+          <input class="profile-input" id="p-salary" type="text" placeholder="75000" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Work Authorization -->
+    <div class="profile-section">
+      <div class="section-label">Work Authorization (US)</div>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="p-authorized">Authorized to work?</label>
+          <select class="profile-input profile-select" id="p-authorized">
+            <option value="">— select —</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label for="p-sponsorship">Need sponsorship?</label>
+          <select class="profile-input profile-select" id="p-sponsorship">
+            <option value="">— select —</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- EEO -->
+    <div class="profile-section">
+      <div class="section-label">EEO (optional — used for demographic questions)</div>
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label for="p-gender">Gender</label>
+          <select class="profile-input profile-select" id="p-gender">
+            <option value="">— select —</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Non-binary</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label for="p-veteran">Veteran status</label>
+          <select class="profile-input profile-select" id="p-veteran">
+            <option value="">— select —</option>
+            <option>I am not a veteran</option>
+            <option>I identify as a protected veteran</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label for="p-disability">Disability status</label>
+          <select class="profile-input profile-select" id="p-disability">
+            <option value="">— select —</option>
+            <option>No, I don't have a disability</option>
+            <option>Yes, I have a disability</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label for="p-ethnicity">Ethnicity</label>
+          <select class="profile-input profile-select" id="p-ethnicity">
+            <option value="">— select —</option>
+            <option>Hispanic or Latino</option>
+            <option>White</option>
+            <option>Black or African American</option>
+            <option>Asian</option>
+            <option>Two or more races</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-profile -->
+
+</div><!-- /main -->
+
+<!-- Action bar (autofill tab) -->
+<div id="action-bar">
+  <button class="btn btn-teal"   id="fill-btn">Fill Form</button>
+  <button class="btn btn-green"  id="submit-btn">Submit</button>
+  <button class="btn btn-primary" id="rescan-btn">Re-scan</button>
+  <button class="btn btn-ghost"  id="clear-btn" style="margin-left:auto;">Clear</button>
+</div>
+
+<!-- Profile save bar -->
+<div class="profile-save-bar" id="profile-save-bar" style="display:none;">
+  <span class="save-note" id="save-note">Changes not saved</span>
+  <button class="btn btn-primary" id="save-profile-btn">Save Profile</button>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

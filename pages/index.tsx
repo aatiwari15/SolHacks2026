@@ -22,7 +22,6 @@ export default function UnidadPage() {
 
   function handleSelectChat(id: string) {
     setActiveChatId(id);
-    // For demo: always go to dante flow when selecting a past chat
     setView({ type: "chat", task: "dante" });
   }
 
@@ -31,30 +30,26 @@ export default function UnidadPage() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0d0905]">
+    <div className="flex h-screen w-screen overflow-hidden bg-surface-base">
       <ChatSidebar
         activeChatId={activeChatId}
         onSelectChat={handleSelectChat}
         onNewChat={handleNewChat}
       />
 
-      <main className="flex flex-1 flex-col overflow-hidden bg-[#120d07]">
+      <main className="flex flex-1 flex-col overflow-hidden bg-surface-main">
         {view.type === "welcome" && (
           <WelcomeScreen onNewChat={handleNewChat} />
         )}
-
         {view.type === "task-select" && (
           <TaskSelector onStart={handleStartTask} />
         )}
-
         {view.type === "chat" && view.task === "dante" && (
           <DanteFormFlow />
         )}
-
         {view.type === "chat" && view.task === "habla" && (
           <PlaceholderChat agent="habla" label="Habla · Translation Practice" />
         )}
-
         {view.type === "chat" && view.task === "simpli" && (
           <PlaceholderChat agent="simpli" label="Simpli · Jargon Decoder" />
         )}
@@ -63,18 +58,16 @@ export default function UnidadPage() {
   );
 }
 
-// Placeholder for Habla/Simpli flows (to be built next)
 function PlaceholderChat({ agent, label }: { agent: string; label: string }) {
-  const color = agent === "habla" ? "text-teal-400 bg-teal-500" : "text-lime-400 bg-lime-500";
-  const [c1, c2] = color.split(" ");
+  const isTeal = agent === "habla";
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center px-6">
-      <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold text-white ${c2}`}>
-        {agent === "habla" ? "Ha" : "Si"}
+      <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold text-white ${isTeal ? "bg-teal-500" : "bg-lime-500"}`}>
+        {isTeal ? "Ha" : "Si"}
       </div>
       <div>
-        <p className={`text-base font-semibold ${c1}`}>{label}</p>
-        <p className="text-sm text-[#7a6045] mt-1">Coming soon — this flow is being built.</p>
+        <p className={`text-base font-semibold ${isTeal ? "text-teal-500" : "text-lime-500"}`}>{label}</p>
+        <p className="text-sm text-fg-muted mt-1">Coming soon — this flow is being built.</p>
       </div>
     </div>
   );

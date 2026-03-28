@@ -3,8 +3,57 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Light mode (default) ──────────────────────────────────────────────────── */
 :root {
   --radius: 0.75rem;
+
+  /* shadcn/Radix tokens — light */
+  --background: 35 30% 97%;
+  --foreground: 25 40% 12%;
+  --card: 35 30% 99%;
+  --card-foreground: 25 40% 12%;
+  --popover: 35 30% 99%;
+  --popover-foreground: 25 40% 12%;
+  --primary: 35 90% 50%;
+  --primary-foreground: 25 40% 12%;
+  --secondary: 32 20% 91%;
+  --secondary-foreground: 25 40% 12%;
+  --muted: 32 20% 91%;
+  --muted-foreground: 28 18% 55%;
+  --accent: 32 20% 91%;
+  --accent-foreground: 25 40% 12%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 32 20% 85%;
+  --input: 32 20% 85%;
+  --ring: 35 90% 50%;
+
+  /* Semantic surface tokens */
+  --surface-base:    hsl(35 30% 97%);
+  --surface-main:    hsl(32 25% 94%);
+  --surface-sidebar: hsl(32 20% 95%);
+  --surface-card:    hsl(35 30% 99%);
+  --surface-hover:   hsl(34 22% 91%);
+  --surface-active:  hsl(33 24% 88%);
+
+  /* Semantic text tokens */
+  --fg-primary:    hsl(25 40% 12%);
+  --fg-body:       hsl(25 35% 18%);
+  --fg-secondary:  hsl(28 25% 38%);
+  --fg-muted:      hsl(28 18% 55%);
+  --fg-disabled:   hsl(28 14% 65%);
+  --fg-chat-title: hsl(27 28% 32%);
+  --fg-amber-btn:  hsl(25 40% 12%);
+
+  /* Semantic border tokens */
+  --border-base:   hsl(32 20% 85%);
+  --border-input:  hsl(32 18% 82%);
+  --border-active: hsl(32 22% 78%);
+  --border-hover:  hsl(32 20% 76%);
+}
+
+/* ── Dark mode overrides ───────────────────────────────────────────────────── */
+.dark {
   --background: 30 15% 6%;
   --foreground: 35 60% 88%;
   --card: 28 20% 10%;
@@ -24,32 +73,76 @@
   --border: 28 22% 18%;
   --input: 28 22% 18%;
   --ring: 35 90% 55%;
+
+  --surface-base:    #0d0905;
+  --surface-main:    #120d07;
+  --surface-sidebar: #110c07;
+  --surface-card:    #1e1509;
+  --surface-hover:   #241a0d;
+  --surface-active:  #2e1f0d;
+
+  --fg-primary:    #f2dfc4;
+  --fg-body:       #e0c9a8;
+  --fg-secondary:  #a8906c;
+  --fg-muted:      #7a6045;
+  --fg-disabled:   #5a4030;
+  --fg-chat-title: #c4a882;
+  --fg-amber-btn:  #1a0f04;
+
+  --border-base:   #2a1e10;
+  --border-input:  #3a2a18;
+  --border-active: #3d2a14;
+  --border-hover:  #4a3820;
 }
 
+/* ── Tailwind theme registration ───────────────────────────────────────────── */
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
+  --color-background:    hsl(var(--background));
+  --color-foreground:    hsl(var(--foreground));
+  --color-card:          hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
+  --color-popover:       hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
+  --color-primary:       hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
+  --color-secondary:     hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
+  --color-muted:         hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
+  --color-accent:        hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
+  --color-destructive:   hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
+  --color-border:        hsl(var(--border));
+  --color-input:         hsl(var(--input));
+  --color-ring:          hsl(var(--ring));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Semantic surface utilities */
+  --color-surface-base:    var(--surface-base);
+  --color-surface-main:    var(--surface-main);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-surface-card:    var(--surface-card);
+  --color-surface-hover:   var(--surface-hover);
+  --color-surface-active:  var(--surface-active);
+
+  /* Semantic text utilities */
+  --color-fg-primary:    var(--fg-primary);
+  --color-fg-body:       var(--fg-body);
+  --color-fg-secondary:  var(--fg-secondary);
+  --color-fg-muted:      var(--fg-muted);
+  --color-fg-disabled:   var(--fg-disabled);
+  --color-fg-chat-title: var(--fg-chat-title);
+  --color-fg-amber-btn:  var(--fg-amber-btn);
+
+  /* Semantic border utilities */
+  --color-border-base:   var(--border-base);
+  --color-border-input:  var(--border-input);
+  --color-border-active: var(--border-active);
+  --color-border-hover:  var(--border-hover);
 }
 
 * {
@@ -57,8 +150,8 @@
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--surface-base);
+  color: var(--fg-primary);
   font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -71,24 +164,36 @@ html, body {
   height: 100%;
 }
 
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: hsl(28 22% 20%); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: hsl(32 20% 78%); border-radius: 2px; }
+.dark ::-webkit-scrollbar-thumb { background: hsl(28 22% 20%); }
 
+/* ── Shimmer (skeleton loading) ────────────────────────────────────────────── */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
 }
 .shimmer {
   background: linear-gradient(90deg,
+    hsl(32 22% 88%) 25%,
+    hsl(35 28% 92%) 50%,
+    hsl(32 22% 88%) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}
+.dark .shimmer {
+  background: linear-gradient(90deg,
     hsl(28 22% 15%) 25%,
     hsl(35 30% 22%) 50%,
     hsl(28 22% 15%) 75%
   );
   background-size: 200% 100%;
-  animation: shimmer 1.6s infinite;
 }
 
+/* ── Animations ────────────────────────────────────────────────────────────── */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -99,7 +204,7 @@ html, body {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.3; transform: scale(0.6); }
 }
-.pulse-dot { animation: pulse-dot 1.1s ease-in-out infinite; }
+.pulse-dot   { animation: pulse-dot 1.1s ease-in-out infinite; }
 .pulse-dot-2 { animation: pulse-dot 1.1s ease-in-out 0.2s infinite; }
 .pulse-dot-3 { animation: pulse-dot 1.1s ease-in-out 0.4s infinite; }
 

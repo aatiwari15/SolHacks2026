@@ -1,7 +1,11 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
+import { ThemeProvider } from "next-themes";
 
-// Unidad uses a fixed warm-dark theme — no theme switching needed.
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <Component {...pageProps} />
+    </ThemeProvider>
+  );
 }
