@@ -1,7 +1,23 @@
 import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-// Browser-safe Supabase client — uses only public keys.
-export const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-);
+let browserClient: SupabaseClient | null = null;
+
+export function getSupabaseBrowserClient() {
+  if (browserClient) {
+    return browserClient;
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!url || !publishableKey) {
+    throw new Error(
+      "Missing Supabase browser environment variables. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.",
+    );
+  }
+
+  browserClient = createBrowserClient(url, publishableKey);
+
+  return browserClient;
+}

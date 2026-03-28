@@ -24,32 +24,34 @@ type FormField = {
 };
 
 const MOCK_FIELDS: FormField[] = [
-  { label: "Full Legal Name",        labelEs: "Nombre Legal Completo",       value: "Ana María García",      filled: true },
-  { label: "Date of Birth",          labelEs: "Fecha de Nacimiento",         value: "14 de marzo, 1992",     filled: true },
-  { label: "Country of Birth",       labelEs: "País de Nacimiento",          value: "México",                filled: true },
-  { label: "Alien Registration #",   labelEs: "Número de Registro (USCIS)",  value: "A-204 812 937",         filled: true },
-  { label: "Entry Date",             labelEs: "Fecha de Entrada a EE.UU.",   value: "08 de enero, 2019",     filled: true },
-  { label: "Current Status",         labelEs: "Estatus Migratorio Actual",   value: "F-1 Estudiante",        filled: true },
+  { label: "Full Legal Name",          labelEs: "Nombre Legal Completo",          value: "Ana María García",        filled: true },
+  { label: "Date of Birth",            labelEs: "Fecha de Nacimiento",            value: "14 de marzo, 1992",       filled: true },
+  { label: "Country of Birth",         labelEs: "País de Nacimiento",             value: "México",                  filled: true },
+  { label: "Alien Registration #",     labelEs: "Número de Registro (USCIS)",     value: "A-204 812 937",           filled: true },
+  { label: "Entry Date",               labelEs: "Fecha de Entrada a EE.UU.",      value: "08 de enero, 2019",       filled: true },
+  { label: "Current Status",           labelEs: "Estatus Migratorio Actual",      value: "F-1 Estudiante",          filled: true },
 ];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function AgentBubble({
-  agent, children, delay = 0,
+  agent,
+  children,
+  delay = 0,
 }: {
   agent: "dante" | "habla" | "simpli";
   children: React.ReactNode;
   delay?: number;
 }) {
   const meta = {
-    dante:  { color: "bg-orange-500",  label: "Dante",  tag: "The Doer",       text: "text-orange-500", border: "border-orange-500/20", bg: "bg-orange-500/6" },
-    habla:  { color: "bg-teal-500",    label: "Habla",  tag: "The Translator", text: "text-teal-600 dark:text-teal-400",   border: "border-teal-500/20",   bg: "bg-teal-500/6" },
-    simpli: { color: "bg-lime-500",    label: "Simpli", tag: "The Decoder",    text: "text-lime-600 dark:text-lime-400",   border: "border-lime-500/20",   bg: "bg-lime-500/6" },
+    dante:  { color: "bg-nexus-dante",  label: "Dante",  tag: "The Doer",       text: "text-nexus-dante", border: "border-nexus-dante/20", bg: "bg-white" },
+    habla:  { color: "bg-nexus-mismo",  label: "Habla",  tag: "The Translator", text: "text-nexus-mismo", border: "border-nexus-mismo/20", bg: "bg-white" },
+    simpli: { color: "bg-nexus-simpli", label: "Simpli", tag: "The Decoder",    text: "text-nexus-simpli", border: "border-nexus-simpli/20", bg: "bg-white" },
   }[agent];
 
   return (
     <div
-      className={cn("flex gap-3 fade-up rounded-2xl p-4 border", meta.border, meta.bg)}
+      className={cn("flex gap-3 fade-up", meta.border, meta.bg, "rounded-2xl p-4 border")}
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white", meta.color)}>
@@ -58,9 +60,9 @@ function AgentBubble({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 mb-1.5">
           <span className={cn("text-xs font-bold", meta.text)}>{meta.label}</span>
-          <span className="text-[10px] text-fg-muted">· {meta.tag}</span>
+          <span className="text-[10px] text-nexus-muted">· {meta.tag}</span>
         </div>
-        <div className="text-sm text-fg-body leading-relaxed">{children}</div>
+        <div className="text-sm leading-relaxed text-nexus-text">{children}</div>
       </div>
     </div>
   );
@@ -69,8 +71,8 @@ function AgentBubble({
 function UserBubble({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex justify-end fade-up">
-      <div className="max-w-[80%] rounded-2xl rounded-br-md bg-amber-500/15 border border-amber-500/25 px-4 py-3">
-        <p className="text-sm text-fg-primary leading-relaxed">{children}</p>
+      <div className="max-w-[80%] rounded-2xl rounded-br-md border border-nexus-accent/20 bg-nexus-accent/8 px-4 py-3">
+        <p className="text-sm leading-relaxed text-nexus-text">{children}</p>
       </div>
     </div>
   );
@@ -79,9 +81,9 @@ function UserBubble({ children }: { children: React.ReactNode }) {
 function ThinkingDots() {
   return (
     <div className="flex items-center gap-1.5 py-1">
-      <span className="h-2 w-2 rounded-full bg-fg-secondary pulse-dot" />
-      <span className="h-2 w-2 rounded-full bg-fg-secondary pulse-dot-2" />
-      <span className="h-2 w-2 rounded-full bg-fg-secondary pulse-dot-3" />
+      <span className="pulse-dot h-2 w-2 rounded-full bg-nexus-muted" />
+      <span className="pulse-dot-2 h-2 w-2 rounded-full bg-nexus-muted" />
+      <span className="pulse-dot-3 h-2 w-2 rounded-full bg-nexus-muted" />
     </div>
   );
 }
@@ -89,12 +91,12 @@ function ThinkingDots() {
 function ParsingAnimation() {
   return (
     <div className="space-y-2 py-1">
-      <p className="text-xs text-orange-500 font-semibold mb-3 flex items-center gap-2">
+      <p className="mb-3 flex items-center gap-2 text-xs font-semibold text-nexus-dante">
         <Zap className="h-3.5 w-3.5" />
         Reading document structure…
       </p>
       {["Detecting form fields", "Identifying required fields", "Extracting field labels", "Mapping to profile data"].map((step, i) => (
-        <div key={step} className="shimmer h-6 rounded-lg" style={{ animationDelay: `${i * 150}ms`, width: `${70 + i * 5}%` }} />
+        <div key={step} className="flex items-center gap-2.5 shimmer h-6 rounded-lg" style={{ animationDelay: `${i * 150}ms`, width: `${70 + i * 5}%` }} />
       ))}
     </div>
   );
@@ -103,48 +105,54 @@ function ParsingAnimation() {
 function HablaConnectAnimation() {
   return (
     <div className="py-2">
-      <p className="text-xs text-teal-600 dark:text-teal-400 font-semibold mb-4 flex items-center gap-2">
+      <p className="mb-4 flex items-center gap-2 text-xs font-semibold text-nexus-mismo">
         <Languages className="h-3.5 w-3.5" />
         Connecting with Habla for translation…
       </p>
 
+      {/* Agent communication visual */}
       <div className="flex items-center gap-3 mb-4">
+        {/* Dante */}
         <div className="flex flex-col items-center gap-1.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-xs font-bold text-white shadow-lg shadow-orange-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-nexus-dante text-xs font-bold text-white shadow-lg shadow-nexus-dante/20">
             Da
           </div>
-          <span className="text-[10px] text-orange-500 font-semibold">Dante</span>
+          <span className="text-[10px] font-semibold text-nexus-dante">Dante</span>
         </div>
 
+        {/* Animated connection line */}
         <div className="flex-1 flex flex-col items-center gap-1">
           <svg viewBox="0 0 120 20" className="w-full" height="20">
-            <line x1="0" y1="10" x2="120" y2="10" stroke="var(--border-base)" strokeWidth="2" />
+            <line x1="0" y1="10" x2="120" y2="10" stroke="#d6e4d8" strokeWidth="2" />
             <line
               x1="0" y1="10" x2="120" y2="10"
-              stroke="#2dd4bf"
+              stroke="#0d9488"
               strokeWidth="2"
               strokeDasharray="8 4"
               className="agent-comm"
             />
-            <circle cx="30" cy="10" r="3" fill="#f59e0b" opacity="0.8">
+            {/* Packet circles */}
+            <circle cx="30" cy="10" r="3" fill="#16a34a" opacity="0.8">
               <animate attributeName="cx" from="0" to="120" dur="1.4s" repeatCount="indefinite" />
             </circle>
           </svg>
-          <span className="text-[9px] text-fg-muted tracking-wider uppercase">translating fields</span>
+          <span className="text-[9px] uppercase tracking-wider text-nexus-muted">translating fields</span>
         </div>
 
+        {/* Habla */}
         <div className="flex flex-col items-center gap-1.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500 text-xs font-bold text-white shadow-lg shadow-teal-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-nexus-mismo text-xs font-bold text-white shadow-lg shadow-nexus-mismo/20">
             Ha
           </div>
-          <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">Habla</span>
+          <span className="text-[10px] font-semibold text-nexus-mismo">Habla</span>
         </div>
       </div>
 
+      {/* Translation lines shimmer */}
       <div className="space-y-2">
         {["Full Legal Name → Nombre Legal Completo", "Date of Birth → Fecha de Nacimiento", "Country of Birth → País de Nacimiento"].map((line, i) => (
-          <div key={line} className="flex items-center gap-2 text-[11px] text-fg-secondary" style={{ animationDelay: `${i * 200}ms` }}>
-            <div className="h-1.5 w-1.5 rounded-full bg-teal-500/60 pulse-dot" />
+          <div key={line} className="flex items-center gap-2 text-[11px] text-nexus-muted" style={{ animationDelay: `${i * 200}ms` }}>
+            <div className="pulse-dot h-1.5 w-1.5 rounded-full bg-nexus-mismo/60" />
             {line}
           </div>
         ))}
@@ -159,21 +167,21 @@ function FilledFormCard({ fields }: { fields: FormField[] }) {
       {fields.map((field, i) => (
         <div
           key={field.label}
-          className="flex items-center justify-between rounded-xl border border-teal-500/20 bg-teal-500/5 px-3 py-2.5 fade-up"
+          className="fade-up flex items-center justify-between rounded-xl border border-nexus-mismo/20 bg-nexus-mismo/6 px-3 py-2.5"
           style={{ animationDelay: `${i * 60}ms` }}
         >
           <div>
-            <p className="text-[11px] font-semibold text-teal-600 dark:text-teal-400">{field.labelEs}</p>
-            <p className="text-[9px] text-fg-muted">{field.label}</p>
+            <p className="text-[11px] font-semibold text-nexus-mismo">{field.labelEs}</p>
+            <p className="text-[9px] text-nexus-muted">{field.label}</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono text-fg-primary">{field.value}</span>
-            <CheckCircle2 className="h-3.5 w-3.5 text-teal-500 shrink-0" />
+            <span className="text-xs font-mono text-nexus-text">{field.value}</span>
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-nexus-mismo" />
           </div>
         </div>
       ))}
 
-      <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-fg-amber-btn hover:bg-amber-400 transition-colors active:scale-[0.98]">
+      <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-nexus-accent py-2.5 text-sm font-semibold text-white transition-colors hover:brightness-110 active:scale-[0.98]">
         <Download className="h-4 w-4" />
         Download Filled Form
       </button>
@@ -190,6 +198,7 @@ export function DanteFormFlow() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef  = useRef<HTMLTextAreaElement>(null);
 
+  // Auto-advance through animated steps
   useEffect(() => {
     if (step === "dante-parsing") {
       const t = setTimeout(() => setStep("habla-connect"), 2500);
@@ -221,30 +230,35 @@ export function DanteFormFlow() {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex h-12 shrink-0 items-center gap-3 border-b border-border-base px-5">
+      <div className="flex h-12 shrink-0 items-center gap-3 border-b border-nexus-border bg-white/70 px-5">
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-orange-500 text-[10px] font-bold text-white">Da</div>
-          <span className="text-sm font-semibold text-fg-primary">Document Fill</span>
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-nexus-dante text-[10px] font-bold text-white">
+            Da
+          </div>
+          <span className="text-sm font-semibold text-nexus-text">Document Fill</span>
         </div>
-        <ChevronRight className="h-4 w-4 text-fg-muted" />
+        <ChevronRight className="h-4 w-4 text-nexus-muted" />
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-teal-500 text-[10px] font-bold text-white">Ha</div>
-          <span className="text-sm text-fg-secondary">+ Habla Translation</span>
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-nexus-mismo text-[10px] font-bold text-white">
+            Ha
+          </div>
+          <span className="text-sm text-nexus-muted">+ Habla Translation</span>
         </div>
-        <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold text-fg-disabled bg-border-base px-2 py-1 rounded-full">
+        <span className="ml-auto rounded-full bg-nexus-card px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-nexus-muted">
           Demo
         </span>
       </div>
 
       {/* Chat thread */}
-      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto bg-[linear-gradient(to_bottom,#f8fbf9,#f1f8f2)] px-5 py-5">
 
+        {/* Step 1: Dante prompts */}
         <AgentBubble agent="dante">
           <p>
-            ¡Hola! I&apos;m <strong className="text-orange-500">Dante</strong>. To get started,
+            ¡Hola! I&apos;m <strong className="text-orange-400">Dante</strong>. To get started,
             paste your government form text below — it can be in{" "}
-            <strong className="text-orange-500">any language</strong>. I&apos;ll parse the fields
-            and hand them to <strong className="text-teal-600 dark:text-teal-400">Habla</strong> for translation.
+            <strong className="text-orange-300">any language</strong>. I&apos;ll parse the fields
+            and hand them to <strong className="text-teal-400">Habla</strong> for translation.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {["DMV Form", "USCIS I-485", "Social Security", "Tax Form W-4"].map((s) => (
@@ -255,7 +269,7 @@ export function DanteFormFlow() {
                   setStep("user-pasting");
                   inputRef.current?.focus();
                 }}
-                className="flex items-center gap-1 rounded-full border border-orange-500/25 bg-orange-500/8 px-2.5 py-1 text-xs text-orange-500 hover:bg-orange-500/16 transition-colors"
+                className="flex items-center gap-1 rounded-full border border-orange-500/25 bg-orange-500/8 px-2.5 py-1 text-xs text-orange-400 hover:bg-orange-500/16 transition-colors"
               >
                 <FileText className="h-3 w-3" />
                 {s}
@@ -264,31 +278,41 @@ export function DanteFormFlow() {
           </div>
         </AgentBubble>
 
+        {/* Step 2+: User's pasted text */}
         {pastedText && <UserBubble>{pastedText}</UserBubble>}
 
+        {/* Step 3: Parsing */}
         {(step === "dante-parsing" || step === "habla-connect" || step === "filling" || step === "done") && (
           <AgentBubble agent="dante" delay={100}>
             {step === "dante-parsing" ? (
               <ParsingAnimation />
             ) : (
-              <p>✅ I&apos;ve identified <strong className="text-orange-500">6 form fields</strong>. Sending to Habla for Spanish translation…</p>
+              <p>
+                ✅ I&apos;ve identified <strong className="text-nexus-dante">6 form fields</strong>.
+                Sending to Habla for Spanish translation…
+              </p>
             )}
           </AgentBubble>
         )}
 
+        {/* Step 4: Habla connecting */}
         {(step === "habla-connect" || step === "filling" || step === "done") && (
           <AgentBubble agent="habla" delay={200}>
             {step === "habla-connect" ? (
               <HablaConnectAnimation />
             ) : (
-              <p>Translation complete! All fields translated to <strong className="text-teal-600 dark:text-teal-400">Español</strong>. Sending back to Dante to fill the form…</p>
+              <p>
+                Translation complete! All fields translated to{" "}
+                <strong className="text-nexus-mismo">Español</strong>. Sending back to Dante to fill the form…
+              </p>
             )}
           </AgentBubble>
         )}
 
+        {/* Step 5: Filling */}
         {step === "filling" && (
           <AgentBubble agent="dante" delay={100}>
-            <p className="text-sm text-orange-500 font-semibold flex items-center gap-2 mb-2">
+            <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-nexus-dante">
               <Zap className="h-4 w-4" />
               Filling form fields…
             </p>
@@ -296,11 +320,12 @@ export function DanteFormFlow() {
           </AgentBubble>
         )}
 
+        {/* Step 6: Done */}
         {step === "done" && (
           <AgentBubble agent="dante" delay={0}>
             <p className="mb-3">
               🎉 Done! Here&apos;s your form — all 6 fields filled in{" "}
-              <strong className="text-teal-600 dark:text-teal-400">Español</strong>. Review before submitting.
+              <strong className="text-nexus-mismo">Español</strong>. Review before submitting.
             </p>
             <FilledFormCard fields={MOCK_FIELDS} />
           </AgentBubble>
@@ -311,8 +336,8 @@ export function DanteFormFlow() {
 
       {/* Input area */}
       {showInput && (
-        <div className="shrink-0 border-t border-border-base px-5 py-4">
-          <div className="flex items-end gap-3 rounded-2xl border border-border-input bg-surface-card px-4 py-3 focus-within:border-amber-500/40 transition-colors">
+        <div className="shrink-0 border-t border-nexus-border bg-white/85 px-5 py-4">
+          <div className="flex items-end gap-3 rounded-2xl border border-nexus-border bg-white px-4 py-3 transition-colors focus-within:border-nexus-accent/40">
             <textarea
               ref={inputRef}
               value={inputValue}
@@ -322,7 +347,7 @@ export function DanteFormFlow() {
               }}
               placeholder="Paste your form text here (any language)…"
               rows={3}
-              className="flex-1 resize-none bg-transparent text-sm text-fg-primary placeholder-[var(--fg-disabled)] outline-none leading-relaxed"
+              className="flex-1 resize-none bg-transparent text-sm leading-relaxed text-nexus-text outline-none placeholder:text-nexus-muted"
               style={{ maxHeight: "180px" }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
@@ -337,14 +362,14 @@ export function DanteFormFlow() {
               className={cn(
                 "shrink-0 flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200",
                 inputValue.trim()
-                  ? "bg-amber-500 text-fg-amber-btn hover:bg-amber-400 shadow-md shadow-amber-500/20"
-                  : "bg-border-base text-fg-disabled cursor-not-allowed",
+                  ? "bg-nexus-accent text-white shadow-md shadow-nexus-accent/25 hover:brightness-110"
+                  : "cursor-not-allowed bg-nexus-card text-nexus-muted",
               )}
             >
               <Send className="h-4 w-4" />
             </button>
           </div>
-          <p className="mt-2 text-center text-[11px] text-fg-disabled">
+          <p className="mt-2 text-center text-[11px] text-nexus-muted">
             ⌘ + Enter to submit · Supports any language
           </p>
         </div>

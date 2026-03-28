@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabaseBrowserClient } from "./supabase";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -28,6 +28,7 @@ export function joinCommunityPresence(
   guide: GuidePresence,
   onChange: (guides: GuidePresence[]) => void,
 ): () => void {
+  const supabase = getSupabaseBrowserClient();
   const channel: RealtimeChannel = supabase
     .channel(COMMUNITY_CHANNEL)
     .on("presence", { event: "sync" }, () => {
@@ -49,8 +50,8 @@ export function joinCommunityPresence(
     });
 
   return () => {
-    channel.untrack();
-    supabase.removeChannel(channel);
+    void channel.untrack();
+    void supabase.removeChannel(channel);
   };
 }
 
