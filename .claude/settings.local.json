@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/apurwakhanal/Downloads/**)",
+      "Bash(unzip -o a05-oriole-APKhanal-main.zip -d a05-oriole-APKhanal-main)",
+      "Read(//Users/apurwakhanal/Repo/**)",
+      "Bash(cp:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
