@@ -105,6 +105,21 @@ async function ensureProfileForSession(session: Session | null) {
   });
 }
 
+async function safeEnsureProfileForSession(session: Session | null) {
+  if (!session) {
+    return;
+  }
+
+  try {
+    await ensureProfileForSession(session);
+  } catch (error) {
+    console.warn(
+      "Profile sync failed; continuing with auth session.",
+      error instanceof Error ? error.message : error,
+    );
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -123,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      await ensureProfileForSession(currentSession);
+      await safeEnsureProfileForSession(currentSession);
       setSession(currentSession);
       setUser(mapSupabaseUser(currentSession?.user ?? null));
       setLoading(false);
@@ -134,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      void ensureProfileForSession(nextSession);
+      void safeEnsureProfileForSession(nextSession);
       setSession(nextSession);
       setUser(mapSupabaseUser(nextSession?.user ?? null));
       setLoading(false);
@@ -162,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error("Could not load your account.");
     }
 
-    await ensureProfileForSession(data.session);
+    await safeEnsureProfileForSession(data.session);
     setSession(data.session);
     setUser(appUser);
 
@@ -185,7 +200,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(error.message);
     }
 
-    await ensureProfileForSession(data.session);
+    await safeEnsureProfileForSession(data.session);
 
     const appUser = mapSupabaseUser(data.user);
 
