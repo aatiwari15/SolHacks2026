@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabaseBrowserClient } from "./supabase";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ export type BroadcastEvent =
  * Both the Selenium backend and the Next.js frontend join the same channel.
  */
 export function createBroadcastChannel(roomId: string): RealtimeChannel {
-  return supabase.channel(`room:${roomId}`);
+  return getSupabaseBrowserClient().channel(`room:${roomId}`);
 }
 
 /**
@@ -59,7 +59,7 @@ export function subscribeToBroadcast(
     .subscribe();
 
   return () => {
-    supabase.removeChannel(channel);
+    void getSupabaseBrowserClient().removeChannel(channel);
   };
 }
 
@@ -78,5 +78,5 @@ export async function sendBroadcast(
     event: event.event,
     payload: event.payload,
   });
-  await supabase.removeChannel(channel);
+  await getSupabaseBrowserClient().removeChannel(channel);
 }

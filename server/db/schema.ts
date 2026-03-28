@@ -31,6 +31,17 @@ export const profiles = pgTable("profiles", {
   // References auth.users — enforced at the Supabase RLS layer.
   userId: uuid("user_id").notNull().unique(),
   nativeLanguage: text("native_language").notNull(),
+  fullName: text("full_name").notNull().default(""),
+  phoneNumber: text("phone_number").notNull().default(""),
+  email: text("email").notNull().default(""),
+  contactName: text("contact_name").notNull().default(""),
+  contactPhone: text("contact_phone").notNull().default(""),
+  addressLine1: text("address_line_1").notNull().default(""),
+  addressLine2: text("address_line_2").notNull().default(""),
+  city: text("city").notNull().default(""),
+  stateRegion: text("state_region").notNull().default(""),
+  postalCode: text("postal_code").notNull().default(""),
+  country: text("country").notNull().default(""),
   expertiseLevel: expertiseLevelEnum("expertise_level")
     .notNull()
     .default("learner"),
