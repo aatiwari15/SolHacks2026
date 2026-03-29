@@ -53,11 +53,16 @@ const MATCHERS = [
   ["ethnicity",    ["ethnicity","race","racial","ethnic"]],
 ];
 
+// ── Unidad API ────────────────────────────────────────────────────────────────
+// Change this to your deployed URL in production.
+const UNIDAD_API_URL = "http://localhost:3000";
+
 // ── State ─────────────────────────────────────────────────────────────────────
 
-let currentTabId = null;
-let formConfig   = null;  // { form_title, fields[], submitSelector }
-let profile      = {};    // saved profile from storage
+let currentTabId   = null;
+let formConfig     = null;  // { form_title, fields[], submitSelector }
+let profile        = {};    // saved profile from storage
+let sessionToken   = null;  // persistent extension identity (UUID)
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
@@ -69,8 +74,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("header-url").textContent = new URL(tab.url).hostname;
   } catch (_) {}
 
-  // Load profile
-  profile = await loadProfile();
+  // Load profile and session token in parallel
+  [profile, sessionToken] = await Promise.all([loadProfile(), getOrCreateSessionToken()]);
   renderProfileForm(profile);
 
   // Wire tab buttons
@@ -82,6 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("scan-btn").addEventListener("click",   () => scanPage());
   document.getElementById("rescan-btn").addEventListener("click", () => scanPage());
   document.getElementById("fill-btn").addEventListener("click",   () => fillForm());
+  document.getElementById("send-btn").addEventListener("click",   () => sendToUnidad());
   document.getElementById("submit-btn").addEventListener("click", () => submitForm());
   document.getElementById("clear-btn").addEventListener("click",  () => clearSession());
 
@@ -150,6 +156,17 @@ async function saveProfile() {
   if (formConfig) {
     applyProfileMatches(formConfig.fields, p);
   }
+}
+
+// ── Session token ─────────────────────────────────────────────────────────────
+
+/** Returns a stable UUID for this extension install, creating one if needed. */
+async function getOrCreateSessionToken() {
+  const result = await chrome.storage.local.get("unidadSessionToken");
+  if (result.unidadSessionToken) return result.unidadSessionToken;
+  const token = crypto.randomUUID();
+  await chrome.storage.local.set({ unidadSessionToken: token });
+  return token;
 }
 
 function setSaveNote(msg, saved) {
@@ -436,6 +453,51 @@ async function fillForm() {
     );
   } catch (e) {
     showAlert("error", `Fill error: ${e.message}`);
+  }
+}
+
+// ── Send to Unidad ────────────────────────────────────────────────────────────
+
+/**
+ * POSTs the current formConfig + answers to the Unidad API so agents
+ * (Dante / Habla / Simpli) can retrieve and process the submission.
+ */
+async function sendToUnidad() {
+  if (!formConfig) { showAlert("error", "Scan the page first."); return; }
+
+  const answers = collectAnswers();
+  const [tab]   = await chrome.tabs.query({ active: true, currentWindow: true });
+  const token   = sessionToken ?? await getOrCreateSessionToken();
+
+  const sendBtn = document.getElementById("send-btn");
+  sendBtn.disabled = true;
+  showAlert("info", null, true);
+
+  try {
+    const resp = await fetch(`${UNIDAD_API_URL}/api/form-submission`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionToken: token,
+        pageUrl:      tab.url,
+        pageTitle:    formConfig.form_title,
+        formFields:   formConfig.fields,
+        answers,
+      }),
+    });
+
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+      throw new Error(body.error || `HTTP ${resp.status}`);
+    }
+
+    const { submissionId } = await resp.json();
+    const shortId = String(submissionId).slice(0, 8);
+    showAlert("ok", `Sent to Unidad ✓  (id: ${shortId}…) — an agent will pick this up shortly.`);
+  } catch (e) {
+    showAlert("error", `Could not reach Unidad: ${e.message}. Is the app running at ${UNIDAD_API_URL}?`);
+  } finally {
+    sendBtn.disabled = false;
   }
 }
 

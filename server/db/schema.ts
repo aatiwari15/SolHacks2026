@@ -7,6 +7,8 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+// Run the SQL in supabase/migrations/add_form_submissions.sql to create this table.
+
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 export const expertiseLevelEnum = pgEnum("expertise_level", [
@@ -91,6 +93,31 @@ export const agentLogs = pgTable("agent_logs", {
 // How to read (server-side only, RLS enforced):
 //   SELECT decrypted_secret FROM vault.decrypted_secrets WHERE id = <vaultSecretId>;
 
+// ─── form_submissions ─────────────────────────────────────────────────────────
+// Receives form data posted by the browser extension.
+// Agents poll GET /api/form-submission (with BROADCAST_SECRET) to process these.
+
+export const formSubmissionStatusEnum = pgEnum("form_submission_status", [
+  "pending",
+  "processing",
+  "done",
+]);
+
+export const formSubmissions = pgTable("form_submissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  // Identifies the extension instance — generated once, stored in chrome.storage.local.
+  sessionToken: text("session_token").notNull(),
+  pageUrl: text("page_url").notNull(),
+  pageTitle: text("page_title").notNull().default(""),
+  // Full formConfig.fields array serialised as JSON.
+  formFields: jsonb("form_fields").notNull(),
+  // { field_key: value } answers the user filled in.
+  answers: jsonb("answers").notNull(),
+  status: formSubmissionStatusEnum("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ─── form_vault ───────────────────────────────────────────────────────────────
 export const formVault = pgTable("form_vault", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: uuid("session_id")
