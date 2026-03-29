@@ -7,6 +7,7 @@ export type ProfileRecord = {
   contactPhone: string;
   addressLine1: string;
   addressLine2: string;
+  apartmentNumber: string;
   city: string;
   stateRegion: string;
   postalCode: string;
@@ -22,6 +23,7 @@ export const EMPTY_PROFILE_RECORD: ProfileRecord = {
   contactPhone: "",
   addressLine1: "",
   addressLine2: "",
+  apartmentNumber: "",
   city: "",
   stateRegion: "",
   postalCode: "",
@@ -44,6 +46,7 @@ export function normalizeProfileInput(input: unknown): ProfileRecord {
     contactPhone: cleanString(payload.contactPhone),
     addressLine1: cleanString(payload.addressLine1),
     addressLine2: cleanString(payload.addressLine2),
+    apartmentNumber: cleanString(payload.apartmentNumber),
     city: cleanString(payload.city),
     stateRegion: cleanString(payload.stateRegion),
     postalCode: cleanString(payload.postalCode),
@@ -65,6 +68,7 @@ export function mapProfileRow(row: Record<string, unknown> | null | undefined): 
     contactPhone: cleanString(row.contact_phone),
     addressLine1: cleanString(row.address_line_1),
     addressLine2: cleanString(row.address_line_2),
+    apartmentNumber: cleanString(row.apartment_number),
     city: cleanString(row.city),
     stateRegion: cleanString(row.state_region),
     postalCode: cleanString(row.postal_code),
@@ -74,6 +78,7 @@ export function mapProfileRow(row: Record<string, unknown> | null | undefined): 
 
 export function isProfileReadyForAutofill(profile: ProfileRecord) {
   return [
+    profile.preferredLanguage,
     profile.fullName,
     profile.email,
     profile.phoneNumber,
@@ -82,5 +87,5 @@ export function isProfileReadyForAutofill(profile: ProfileRecord) {
     profile.stateRegion,
     profile.postalCode,
     profile.country,
-  ].every((value) => value.trim().length > 0);
+  ].every((value) => cleanString(value).length > 0);
 }

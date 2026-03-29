@@ -11,7 +11,13 @@ type AppView =
   | { type: "task-select" }
   | { type: "chat"; task: SelectedTask };
 
-export function CurrentAppPage() {
+export function CurrentAppPage({
+  onOpenFaq,
+  onOpenProfileSettings,
+}: {
+  onOpenFaq: () => void;
+  onOpenProfileSettings: () => void;
+}) {
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [view, setView] = useState<AppView>({ type: "welcome" });
 
@@ -31,7 +37,13 @@ export function CurrentAppPage() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-nexus-bg">
-      <ChatSidebar activeChatId={activeChatId} onSelectChat={handleSelectChat} onNewChat={handleNewChat} />
+      <ChatSidebar
+        activeChatId={activeChatId}
+        onNewChat={handleNewChat}
+        onOpenFaq={onOpenFaq}
+        onOpenProfileSettings={onOpenProfileSettings}
+        onSelectChat={handleSelectChat}
+      />
 
       <main className="flex flex-1 flex-col overflow-hidden bg-[linear-gradient(to_bottom,#ffffff,#f4faf5)]">
         {view.type === "welcome" ? <WelcomeScreen onNewChat={handleNewChat} /> : null}

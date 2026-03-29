@@ -40,6 +40,7 @@ export const profiles = pgTable("profiles", {
   contactPhone: text("contact_phone").notNull().default(""),
   addressLine1: text("address_line_1").notNull().default(""),
   addressLine2: text("address_line_2").notNull().default(""),
+  apartmentNumber: text("apartment_number").notNull().default(""),
   city: text("city").notNull().default(""),
   stateRegion: text("state_region").notNull().default(""),
   postalCode: text("postal_code").notNull().default(""),

@@ -2,17 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { FaqModal } from "@/components/unidad/faq-modal";
 import { ProfileOnboardingModal } from "@/components/unidad/profile-onboarding-modal";
 import { CurrentAppPage } from "@/components/unidad/current-app-page";
-import { EMPTY_PROFILE_RECORD, isProfileReadyForAutofill, type ProfileRecord } from "@/lib/profile";
+import { EMPTY_PROFILE_RECORD, type ProfileRecord } from "@/lib/profile";
 import { useAuth } from "@/lib/auth";
 
 export default function AppPage() {
-  const { loading, session, user } = useAuth();
+  const { clearSignupPrompt, didJustSignUp, loading, session, user } = useAuth();
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileRecord>(EMPTY_PROFILE_RECORD);
   const [profileLoading, setProfileLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFaq, setShowFaq] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -53,7 +55,6 @@ export default function AppPage() {
         }
 
         setProfile(payload.profile);
-        setShowOnboarding(!isProfileReadyForAutofill(payload.profile));
       } catch {
         if (!active) {
           return;
@@ -67,7 +68,6 @@ export default function AppPage() {
         };
 
         setProfile(fallbackProfile);
-        setShowOnboarding(!isProfileReadyForAutofill(fallbackProfile));
       } finally {
         if (active) {
           setProfileLoading(false);
@@ -81,6 +81,13 @@ export default function AppPage() {
       active = false;
     };
   }, [session, user]);
+
+  useEffect(() => {
+    if (!loading && user && didJustSignUp) {
+      setShowOnboarding(true);
+      clearSignupPrompt();
+    }
+  }, [clearSignupPrompt, didJustSignUp, loading, user]);
 
   async function handleSaveProfile(nextProfile: ProfileRecord) {
     if (!session) {
@@ -118,7 +125,10 @@ export default function AppPage() {
 
   return (
     <>
-      <CurrentAppPage />
+      <CurrentAppPage
+        onOpenFaq={() => setShowFaq(true)}
+        onOpenProfileSettings={() => setShowOnboarding(true)}
+      />
       {showOnboarding ? (
         <ProfileOnboardingModal
           initialProfile={profile}
@@ -126,6 +136,7 @@ export default function AppPage() {
           onSave={handleSaveProfile}
         />
       ) : null}
+      {showFaq ? <FaqModal onClose={() => setShowFaq(false)} /> : null}
     </>
   );
 }

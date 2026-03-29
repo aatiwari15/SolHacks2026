@@ -30,9 +30,17 @@ type ChatSidebarProps = {
   activeChatId: string | null;
   onSelectChat: (id: string) => void;
   onNewChat: () => void;
+  onOpenProfileSettings: () => void;
+  onOpenFaq: () => void;
 };
 
-export function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: ChatSidebarProps) {
+export function ChatSidebar({
+  activeChatId,
+  onNewChat,
+  onOpenFaq,
+  onOpenProfileSettings,
+  onSelectChat,
+}: ChatSidebarProps) {
   const { user } = useAuth();
   const today    = MOCK_CHATS.filter((c) => c.timestamp === "Today");
   const previous = MOCK_CHATS.filter((c) => c.timestamp !== "Today");
@@ -95,10 +103,18 @@ export function ChatSidebar({ activeChatId, onSelectChat, onNewChat }: ChatSideb
           <p className="truncate text-xs font-semibold text-nexus-text">{user?.name || "Guest User"}</p>
           <p className="text-[10px] text-nexus-muted">{user?.preferredLanguage || "English"} · Learner</p>
         </div>
-        <button className="rounded-lg p-1 text-nexus-muted transition-colors hover:bg-nexus-card hover:text-nexus-text">
+        <button
+          onClick={onOpenProfileSettings}
+          className="rounded-lg p-1 text-nexus-muted transition-colors hover:bg-nexus-card hover:text-nexus-text"
+          aria-label="Open profile settings"
+        >
           <Settings className="h-3.5 w-3.5" />
         </button>
-        <button className="rounded-lg p-1 text-nexus-muted transition-colors hover:bg-nexus-card hover:text-nexus-text">
+        <button
+          onClick={onOpenFaq}
+          className="rounded-lg p-1 text-nexus-muted transition-colors hover:bg-nexus-card hover:text-nexus-text"
+          aria-label="Open FAQ"
+        >
           <HelpCircle className="h-3.5 w-3.5" />
         </button>
       </div>

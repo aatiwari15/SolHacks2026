@@ -31,9 +31,11 @@ type AuthContextValue = {
   user: AppUser | null;
   session: Session | null;
   loading: boolean;
+  didJustSignUp: boolean;
   login: (email: string, password: string) => Promise<AppUser>;
   signup: (payload: SignupPayload) => Promise<{ user: AppUser | null; emailConfirmationRequired: boolean }>;
   logout: () => Promise<void>;
+  clearSignupPrompt: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -124,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [didJustSignUp, setDidJustSignUp] = useState(false);
   const supabase = getSupabaseBrowserClient();
 
   useEffect(() => {
@@ -180,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await safeEnsureProfileForSession(data.session);
     setSession(data.session);
     setUser(appUser);
+    setDidJustSignUp(false);
 
     return appUser;
   }
@@ -206,6 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setSession(data.session ?? null);
     setUser(data.session ? appUser : null);
+    setDidJustSignUp(Boolean(data.session));
 
     return {
       user: data.session ? appUser : null,
@@ -222,15 +227,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setSession(null);
     setUser(null);
+    setDidJustSignUp(false);
   }
 
   const value: AuthContextValue = {
     user,
     session,
     loading,
+    didJustSignUp,
     login,
     signup,
     logout,
+    clearSignupPrompt: () => setDidJustSignUp(false),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
