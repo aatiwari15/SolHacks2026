@@ -7,7 +7,23 @@
       "Bash(cp:*)",
       "Bash(npm install:*)",
       "Bash(npx tsc:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(node -e \":*)",
+      "Bash(curl -s http://localhost:3001/api/form-fields/process -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s http://localhost:3000/api/form-fields/process -o /dev/null -w \"%{http_code}\")",
+      "Bash(GEMINI_API_KEY=\"AIzaSyD5_s8HDoXxlBGqRxmwij4Eko3vMLwssZU\" node --loader ts-node/esm -e \":*)",
+      "Bash(cp /tmp/test-pipeline.mjs \"/Users/apurwakhanal/Repo/Solhacks 2026/SolHacks2026/test-pipeline.mjs\")",
+      "Bash(node test-pipeline.mjs)",
+      "Bash(TOKEN=\"eyJhbGciOiJFUzI1NiIsImtpZCI6ImZkNzhmNWViLThiMTctNDA3Ni05ZjgzLThmZWY1OTVlZTViZCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL25jdHZsbXZhYmFnbXh6eWhtaGJrLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyMDA4OGFkZS00NTZjLTQ3YWEtOTg0Ny1mZjA1YTBmNTM2ODciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0Nzc5MzE4LCJpYXQiOjE3NzQ3NzU3MTgsImVtYWlsIjoiYWFyYXZ0aXdhcmkxNUBnbWFpbC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoiYWFyYXZ0aXdhcmkxNUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkFhcmF2IFRpd2FyaSIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkTGFuZ3VhZ2UiOiJUYW1pbCIsInN1YiI6IjIwMDg4YWRlLTQ1NmMtNDdhYS05ODQ3LWZmMDVhMGY1MzY4NyJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6Im90cCIsInRpbWVzdGFtcCI6MTc3NDc3NTcxOH1dLCJzZXNzaW9uX2lkIjoiODZkYzg2MTUtY2MwMS00N2JhLWFiMGEtNDNiYzgwM2Y2ZjZhIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.HOy97lhW1ut8kmYWOrc4RH7hi4kcW6zgTzSGKvTLI-vwsyAW5TSaSzhaJCbtFPT6Fj16Iuj3wNSGJEb2l7NZVQ\")",
+      "Bash(__NEW_LINE_1eec907361cfeda1__ curl -s -X POST http://localhost:3000/api/form-fields/process -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJFUzI1NiIsImtpZCI6ImZkNzhmNWViLThiMTctNDA3Ni05ZjgzLThmZWY1OTVlZTViZCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL25jdHZsbXZhYmFnbXh6eWhtaGJrLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyMDA4OGFkZS00NTZjLTQ3YWEtOTg0Ny1mZjA1YTBmNTM2ODciLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc0Nzc5MzE4LCJpYXQiOjE3NzQ3NzU3MTgsImVtYWlsIjoiYWFyYXZ0aXdhcmkxNUBnbWFpbC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoiYWFyYXZ0aXdhcmkxNUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkFhcmF2IFRpd2FyaSIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkTGFuZ3VhZ2UiOiJUYW1pbCIsInN1YiI6IjIwMDg4YWRlLTQ1NmMtNDdhYS05ODQ3LWZmMDVhMGY1MzY4NyJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6Im90cCIsInRpbWVzdGFtcCI6MTc3NDc3NTcxOH1dLCJzZXNzaW9uX2lkIjoiODZkYzg2MTUtY2MwMS00N2JhLWFiMGEtNDNiYzgwM2Y2ZjZhIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.HOy97lhW1ut8kmYWOrc4RH7hi4kcW6zgTzSGKvTLI-vwsyAW5TSaSzhaJCbtFPT6Fj16Iuj3wNSGJEb2l7NZVQ\" __NEW_LINE_cf29f5cd4440f912__ curl -s -X POST http://localhost:3000/api/form-fields/process -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{:*)",
+      "Bash(python3 -m json.tool)",
+      "Bash(__NEW_LINE_b125bc8e8f6b87e7__ curl -s -X POST http://localhost:3000/api/form-fields/process -H \"Content-Type: application/json\" -H \"Authorization: Bearer $TOKEN\" -d '{:*)",
+      "Bash(__NEW_LINE_70640fe991e22cf2__ curl:*)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(rm -rf .next/server/pages/api/form-fields .next/server/pages/api/form-submission)",
+      "Bash(ls \"/Users/apurwakhanal/Repo/Solhacks 2026/SolHacks2026/\"*.env*)",
+      "Bash(ls \"/Users/apurwakhanal/Repo/Solhacks 2026/SolHacks2026/\".env*)"
     ]
   }
 }

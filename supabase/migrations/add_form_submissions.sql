@@ -5,14 +5,16 @@
 create type form_submission_status as enum ('pending', 'processing', 'done');
 
 create table if not exists form_submissions (
-  id            uuid primary key default gen_random_uuid(),
-  session_token text not null,           -- extension-generated UUID (chrome.storage.local)
-  page_url      text not null,
-  page_title    text not null default '',
-  form_fields   jsonb not null,          -- array of field definitions from the extension
-  answers       jsonb not null,          -- { field_key: value } map
-  status        form_submission_status not null default 'pending',
-  created_at    timestamptz not null default now()
+  id                   uuid primary key default gen_random_uuid(),
+  session_token        text not null,           -- extension-generated UUID (chrome.storage.local)
+  page_url             text not null,
+  page_title           text not null default '',
+  raw_form_fields      jsonb,                   -- original field definitions as received from the extension
+  raw_answers          jsonb,                   -- original { field_key: value } map as received
+  form_fields          jsonb not null,          -- sanitized field definitions (camelCase split, special chars stripped)
+  answers              jsonb not null,          -- sanitized { field_key: value } map
+  status               form_submission_status not null default 'pending',
+  created_at           timestamptz not null default now()
 );
 
 -- Index so agents can efficiently pull all pending rows

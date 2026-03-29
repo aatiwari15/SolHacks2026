@@ -55,7 +55,7 @@ const MATCHERS = [
 
 // ── Unidad API ────────────────────────────────────────────────────────────────
 // Change this to your deployed URL in production.
-const UNIDAD_API_URL = "http://localhost:3001";
+const UNIDAD_API_URL = "http://localhost:3000";
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -458,9 +458,12 @@ async function fillForm() {
 
 // ── Send to Unidad ────────────────────────────────────────────────────────────
 
+let fillPollInterval = null;  // polls for UNIDAD fill-ready answers
+
 /**
- * POSTs the current formConfig + answers to the Unidad API so agents
- * (Dante / Habla / Simpli) can retrieve and process the submission.
+ * POSTs the current formConfig + answers to the Unidad API so HABLA/LINDA/UNIDAD
+ * can translate, reorder, and interview the user. Then polls for the resulting
+ * fill payload and auto-fills the form when UNIDAD finishes.
  */
 async function sendToUnidad() {
   if (!formConfig) { showAlert("error", "Scan the page first."); return; }
@@ -472,6 +475,9 @@ async function sendToUnidad() {
   const sendBtn = document.getElementById("send-btn");
   sendBtn.disabled = true;
   showAlert("info", null, true);
+
+  // Stop any previous polling
+  if (fillPollInterval) { clearInterval(fillPollInterval); fillPollInterval = null; }
 
   try {
     const resp = await fetch(`${UNIDAD_API_URL}/api/form-submission`, {
@@ -491,9 +497,63 @@ async function sendToUnidad() {
       throw new Error(body.error || `HTTP ${resp.status}`);
     }
 
-    const { submissionId } = await resp.json();
-    const shortId = String(submissionId).slice(0, 8);
-    showAlert("ok", `Sent to Unidad ✓  (id: ${shortId}…) — an agent will pick this up shortly.`);
+    await resp.json();
+    showAlert("info", "✅ Sent to UNIDAD! Answer the questions in the app, then come back here — I'll auto-fill when ready.");
+
+    // ── Start polling for fill-ready answers ─────────────────────────────────
+    let pollCount = 0;
+    const MAX_POLLS = 120; // ~4 minutes at 2s intervals
+
+    fillPollInterval = setInterval(async () => {
+      pollCount++;
+      if (pollCount > MAX_POLLS) {
+        clearInterval(fillPollInterval);
+        fillPollInterval = null;
+        showAlert("info", "Timed out waiting for answers. Re-send the form or fill manually.");
+        return;
+      }
+
+      try {
+        const pr = await fetch(
+          `${UNIDAD_API_URL}/api/form-submission/fill-ready?sessionToken=${encodeURIComponent(token)}`,
+        );
+        if (!pr.ok) return;
+
+        const pd = await pr.json();
+        if (!pd.ready) return; // not ready yet — keep polling
+
+        // ── Answers are ready — fill the form ───────────────────────────────
+        clearInterval(fillPollInterval);
+        fillPollInterval = null;
+
+        showAlert("info", null, true); // spinner
+        const fillResult = await send("FILL", { answers: pd.answers, fields: pd.fields });
+
+        if (fillResult?.ok) {
+          // Render result chips
+          const chips = document.getElementById("fill-chips");
+          chips.innerHTML = (fillResult.results || [])
+            .map((r) => `<span class="chip ${r.ok ? "ok" : "err"}">${r.ok ? "✓" : "✗"} ${esc(r.field_key)}</span>`)
+            .join("");
+          chips.className = "show";
+
+          // Auto-submit the form
+          showAlert("info", "Fields filled — submitting form…", true);
+          await new Promise((r) => setTimeout(r, 600));
+          const submitResult = await send("SUBMIT", { selector: formConfig?.submitSelector ?? null });
+          if (submitResult?.ok) {
+            showAlert("ok", "✅ Form filled and submitted by UNIDAD!");
+          } else {
+            showAlert("ok", "✅ UNIDAD filled your form! Click Submit on the page to finish.");
+          }
+        } else {
+          showAlert("error", `Some fields couldn't be filled: ${fillResult?.error ?? "unknown error"}`);
+        }
+      } catch (_) {
+        // Network hiccup — keep polling silently
+      }
+    }, 2000);
+
   } catch (e) {
     showAlert("error", `Could not reach Unidad: ${e.message}. Is the app running at ${UNIDAD_API_URL}?`);
   } finally {

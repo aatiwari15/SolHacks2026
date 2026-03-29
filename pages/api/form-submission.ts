@@ -85,7 +85,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ error: "Failed to save submission" });
     }
 
-    console.log(`[Unidad] Form submission saved: ${data.id} | ${pageUrl}`);
+    console.log(`\n[DANTE→SERVER] Form submission saved: ${data.id}`);
+    console.log(`[DANTE→SERVER] pageUrl="${pageUrl}" | sessionToken=${sessionToken.slice(0,8)}… | fields=${formFields.length}`);
 
     try {
       const broadcastPayload: Record<string, unknown> = {

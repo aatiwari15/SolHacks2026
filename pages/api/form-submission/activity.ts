@@ -43,13 +43,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const since = parseSince(typeof req.query.since === "string" ? req.query.since : undefined);
+  const submissionId =
+    typeof req.query.submissionId === "string" && req.query.submissionId.trim()
+      ? req.query.submissionId.trim()
+      : undefined;
 
-  const { data, error } = await supabaseAdmin
+  let query = supabaseAdmin
     .from("form_submissions")
-    .select("id, page_url, page_title, form_fields, answers, created_at")
-    .gte("created_at", since)
-    .order("created_at", { ascending: true })
-    .limit(40);
+    .select("id, session_token, page_url, page_title, form_fields, answers, created_at");
+
+  if (submissionId) {
+    query = query.eq("id", submissionId).limit(1);
+  } else {
+    query = query.gte("created_at", since).order("created_at", { ascending: true }).limit(40);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("[Unidad] activity query failed:", error.message);
@@ -65,6 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         : {};
     return {
       id: row.id as string,
+      sessionToken: (row.session_token as string) || "",
       pageUrl: row.page_url as string,
       pageTitle: (row.page_title as string) || "Form",
       fieldCount: formFields.length,

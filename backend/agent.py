@@ -30,7 +30,7 @@ from session_store import FormSession
 load_dotenv()
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-_MODEL = "gemini-2.0-flash"
+_MODEL = "gemma-3-27b-it"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
