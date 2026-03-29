@@ -12,6 +12,85 @@ type ProfileResponse = {
   profile: ProfileRecord;
 };
 
+function buildProfileUpsertPayloads(userId: string, profileInput: ProfileRecord, fallbackEmail: string) {
+  const fullPayload = {
+    user_id: userId,
+    native_language: profileInput.preferredLanguage,
+    full_name: profileInput.fullName,
+    phone_number: profileInput.phoneNumber,
+    email: profileInput.email || fallbackEmail,
+    contact_name: profileInput.contactName,
+    contact_phone: profileInput.contactPhone,
+    address_line_1: profileInput.addressLine1,
+    address_line_2: profileInput.addressLine2,
+    apartment_number: profileInput.apartmentNumber,
+    city: profileInput.city,
+    state_region: profileInput.stateRegion,
+    postal_code: profileInput.postalCode,
+    country: profileInput.country,
+    expertise_level: "learner",
+    community_tags: [],
+  };
+
+  return [
+    fullPayload,
+    {
+      ...fullPayload,
+      apartment_number: undefined,
+    },
+    {
+      ...fullPayload,
+      apartment_number: undefined,
+      community_tags: undefined,
+    },
+    {
+      ...fullPayload,
+      apartment_number: undefined,
+      community_tags: undefined,
+      expertise_level: undefined,
+    },
+    {
+      user_id: userId,
+      native_language: profileInput.preferredLanguage,
+      full_name: profileInput.fullName,
+      phone_number: profileInput.phoneNumber,
+      email: profileInput.email || fallbackEmail,
+      address_line_1: profileInput.addressLine1,
+      address_line_2: profileInput.addressLine2,
+      city: profileInput.city,
+      state_region: profileInput.stateRegion,
+      postal_code: profileInput.postalCode,
+      country: profileInput.country,
+    },
+    {
+      user_id: userId,
+      native_language: profileInput.preferredLanguage,
+      full_name: profileInput.fullName,
+      phone_number: profileInput.phoneNumber,
+      email: profileInput.email || fallbackEmail,
+      address_line_1: profileInput.addressLine1,
+      city: profileInput.city,
+      state_region: profileInput.stateRegion,
+      postal_code: profileInput.postalCode,
+      country: profileInput.country,
+    },
+    {
+      user_id: userId,
+      native_language: profileInput.preferredLanguage,
+      full_name: profileInput.fullName,
+      phone_number: profileInput.phoneNumber,
+      email: profileInput.email || fallbackEmail,
+    },
+    {
+      user_id: userId,
+      native_language: profileInput.preferredLanguage,
+    },
+    {
+      user_id: userId,
+    },
+  ];
+}
+
 function buildFallbackProfile(
   authUser: User,
   profileInput?: ProfileRecord,
@@ -102,29 +181,16 @@ export default async function handler(
 
   const profileInput = normalizeProfileInput(req.body);
   const fallbackProfile = buildFallbackProfile(authResult.user, profileInput);
+  const payloads = buildProfileUpsertPayloads(
+    authResult.user.id,
+    profileInput,
+    authResult.user.email || "",
+  );
+  const [primaryPayload, ...fallbackPayloads] = payloads;
 
   const { error: profileError, data } = await supabaseAdmin
     .from("profiles")
-    .upsert(
-      {
-        user_id: authResult.user.id,
-        native_language: profileInput.preferredLanguage,
-        full_name: profileInput.fullName,
-        phone_number: profileInput.phoneNumber,
-        email: profileInput.email || authResult.user.email || "",
-        contact_name: profileInput.contactName,
-        contact_phone: profileInput.contactPhone,
-        address_line_1: profileInput.addressLine1,
-        address_line_2: profileInput.addressLine2,
-        city: profileInput.city,
-        state_region: profileInput.stateRegion,
-        postal_code: profileInput.postalCode,
-        country: profileInput.country,
-        expertise_level: "learner",
-        community_tags: [],
-      },
-      { onConflict: "user_id" },
-    )
+    .upsert(primaryPayload, { onConflict: "user_id" })
     .select("*")
     .single();
 
@@ -137,21 +203,6 @@ export default async function handler(
   }
 
   if (profileError && isMissingColumnError(profileError.message)) {
-    const fallbackPayloads = [
-      {
-        user_id: authResult.user.id,
-        native_language: profileInput.preferredLanguage,
-        expertise_level: "learner",
-      },
-      {
-        user_id: authResult.user.id,
-        native_language: profileInput.preferredLanguage,
-      },
-      {
-        user_id: authResult.user.id,
-      },
-    ];
-
     for (const payload of fallbackPayloads) {
       const { error: fallbackError, data: fallbackData } = await supabaseAdmin
         .from("profiles")

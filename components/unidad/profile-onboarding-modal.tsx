@@ -59,7 +59,7 @@ export function ProfileOnboardingModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-nexus-border bg-nexus-surface shadow-[0_28px_90px_rgba(15,23,42,0.16)]"
+        className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[28px] border border-nexus-border bg-nexus-surface shadow-[0_28px_90px_rgba(15,23,42,0.16)]"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-b border-nexus-border bg-[radial-gradient(circle_at_top,rgba(21,128,61,0.12),transparent_48%)] px-6 py-5 sm:px-8">
@@ -126,13 +126,22 @@ export function ProfileOnboardingModal({
                 label="Street address"
                 value={profile.addressLine1}
                 autoComplete="address-line1"
+                placeholder="123 Main St"
+                className="sm:col-span-2"
                 onChange={(value) => updateField("addressLine1", value)}
               />
               <Field
-                label="Apartment / unit"
+                label="Address line 2"
                 value={profile.addressLine2}
                 autoComplete="address-line2"
                 onChange={(value) => updateField("addressLine2", value)}
+              />
+              <Field
+                label="Apartment"
+                value={profile.apartmentNumber}
+                autoComplete="off"
+                placeholder="Apartment or unit number (optional)"
+                onChange={(value) => updateField("apartmentNumber", value)}
               />
               <Field
                 label="City"
@@ -198,6 +207,8 @@ function Field({
   type = "text",
   autoComplete,
   icon,
+  placeholder,
+  className,
 }: {
   label: string;
   value: string;
@@ -205,15 +216,18 @@ function Field({
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
   autoComplete?: string;
   icon?: ReactNode;
+  placeholder?: string;
+  className?: string;
 }) {
   return (
-    <label className="space-y-1.5">
+    <label className={`space-y-1.5 ${className ?? ""}`}>
       <span className="text-sm font-medium text-nexus-muted">{label}</span>
       <div className="relative">
         <input
           type={type}
           value={value}
           autoComplete={autoComplete}
+          placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
           className={`input-field ${icon ? "pr-11" : ""}`}
         />
