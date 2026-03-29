@@ -22,11 +22,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabaseAdmin } from "@/server/lib/supabase";
 import { broadcastFormSubmitted } from "@/server/lib/realtime-broadcast";
+import { sanitizeForAgent } from "@/lib/form-field-display";
 
 type SubmissionRow = {
   session_token: string;
   page_url: string;
   page_title: string;
+  raw_form_fields: unknown;
+  raw_answers: unknown;
   form_fields: unknown;
   answers: unknown;
   status: "pending" | "processing" | "done";
@@ -49,12 +52,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
+    const sanitizedFormFields = formFields.map((f) => {
+      if (!f || typeof f !== "object") return f;
+      const field = f as Record<string, unknown>;
+      return typeof field.label === "string"
+        ? { ...field, label: sanitizeForAgent(field.label) }
+        : field;
+    });
+    const sanitizedAnswers = Object.fromEntries(
+      Object.entries(answers).map(([k, v]) => [k, sanitizeForAgent(v)]),
+    );
+
     const row: SubmissionRow = {
       session_token: sessionToken,
       page_url: pageUrl,
       page_title: pageTitle ?? "",
-      form_fields: formFields,
-      answers,
+      raw_form_fields: formFields,
+      raw_answers: answers,
+      form_fields: sanitizedFormFields,
+      answers: sanitizedAnswers,
       status: "pending",
     };
 
@@ -78,8 +94,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pageTitle: pageTitle ?? "",
         sessionToken,
         fieldCount: formFields.length,
-        formFields,
-        answers,
+        formFields: sanitizedFormFields,
+        answers: sanitizedAnswers,
       };
       const approxSize = JSON.stringify(broadcastPayload).length;
       if (approxSize > 240_000) {

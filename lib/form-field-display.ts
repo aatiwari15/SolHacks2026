@@ -14,6 +14,21 @@ export type ApplicationFieldRow = {
   value: string;
 };
 
+/**
+ * Normalize arbitrary text before passing it to the Linda agent.
+ * - Splits camelCase into separate words (e.g. "firstName" → "first Name")
+ * - Strips characters that aren't alphanumeric, whitespace, or common punctuation (.,!?'-/)
+ * - Collapses runs of whitespace to a single space
+ */
+export function sanitizeForAgent(text: string): string {
+  // Split camelCase boundaries
+  const spaced = text.replace(/([a-z])([A-Z])/g, "$1 $2");
+  // Strip unusual non-alphanumeric characters (keep letters, digits, spaces, .,!?'-/)
+  const stripped = spaced.replace(/[^\w\s.,!?'\-/]/g, " ");
+  // Collapse whitespace
+  return stripped.replace(/\s+/g, " ").trim();
+}
+
 /** e.g. emailAddress → "Email address", $$preferredName → "Preferred name" */
 export function humanizeFieldKey(key: string): string {
   const k = key.replace(/^\$+/, "").replace(/_/g, " ").trim();
