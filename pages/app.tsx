@@ -117,8 +117,8 @@ export default function AppPage() {
 
   if (loading || !user || profileLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0d0905]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#d29c62] border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-[linear-gradient(165deg,#f6faf7_0%,#eef6f0_100%)]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-nexus-accent border-t-transparent" />
       </div>
     );
   }
@@ -126,6 +126,7 @@ export default function AppPage() {
   return (
     <>
       <CurrentAppPage
+        applicantLanguage={profile.preferredLanguage}
         onOpenFaq={() => setShowFaq(true)}
         onOpenProfileSettings={() => setShowOnboarding(true)}
       />

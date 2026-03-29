@@ -21,6 +21,7 @@
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabaseAdmin } from "@/server/lib/supabase";
+import { broadcastFormSubmitted } from "@/server/lib/realtime-broadcast";
 
 type SubmissionRow = {
   session_token: string;
@@ -70,24 +71,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log(`[Unidad] Form submission saved: ${data.id} | ${pageUrl}`);
 
-    // Notify any listeners on the agents broadcast channel
-    await supabaseAdmin
-      .channel("unidad:agents")
-      .send({
-        type: "broadcast",
-        event: "form_submitted",
-        payload: {
-          submissionId: data.id,
-          pageUrl,
-          pageTitle: pageTitle ?? "",
-          sessionToken,
-          fieldCount: formFields.length,
-        },
-      })
-      .catch((err: unknown) => {
-        // Non-fatal — submission is already saved in DB
-        console.warn("[Unidad] broadcast send failed (non-fatal):", err);
-      });
+    try {
+      const broadcastPayload: Record<string, unknown> = {
+        submissionId: data.id,
+        pageUrl,
+        pageTitle: pageTitle ?? "",
+        sessionToken,
+        fieldCount: formFields.length,
+        formFields,
+        answers,
+      };
+      const approxSize = JSON.stringify(broadcastPayload).length;
+      if (approxSize > 240_000) {
+        console.warn(
+          `[Unidad] broadcast payload large (${approxSize} chars); omitting formFields/answers`,
+        );
+        delete broadcastPayload.formFields;
+        delete broadcastPayload.answers;
+      }
+      await broadcastFormSubmitted(broadcastPayload);
+    } catch (err) {
+      console.warn("[Unidad] broadcast failed (non-fatal):", err);
+    }
 
     return res.status(201).json({ submissionId: data.id });
   }
